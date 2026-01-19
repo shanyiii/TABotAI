@@ -2,7 +2,7 @@ from langchain_qdrant import QdrantVectorStore
 from langchain_openai import OpenAIEmbeddings
 from google import genai
 
-from mdSplitter import splitter
+from file_processor import splitter
 from config import GEMINI_API_KEY
 
 embeddings = OpenAIEmbeddings()

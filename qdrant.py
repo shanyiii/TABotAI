@@ -2,7 +2,7 @@ from qdrant_client import QdrantClient, models
 from sentence_transformers import SentenceTransformer
 from tqdm import tqdm
 from uuid import uuid4
-from mdSplitter import splitter
+from file_processor import splitter
 
 doc_chunks = splitter()
 documents = list()
