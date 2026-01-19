@@ -29,10 +29,7 @@ def pdf2md():
     with open("marker_test_output.md", "w", encoding="utf-8") as f:
         f.write(markdown_output)
 
-def splitter():
-    with open("marker_test_output.md", 'r', encoding='utf-8') as input_file:
-        md_content = input_file.read()
-
+def md_splitter(md_content):
     headers_to_split_on = [  
         ("#", "Header 1"),  
         ("##", "Header 2"),  
