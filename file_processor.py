@@ -10,6 +10,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
+from collections import defaultdict
 
 from config import OPENAI_API_KEY, LANGCHAIN_API_KEY
 from common import FILEPATH
@@ -59,7 +60,7 @@ def md_splitter(md_content):
 class Tags(BaseModel):
     tags: list[str] = Field(description="與文本有關的標籤列表")
 
-def get_tags_from_gpt(course_name, level, doc_content):
+def get_tags_from_gpt(course_name: str, level: str, doc_content: str) -> str:
     model = ChatOpenAI(temperature=0, model_name="gpt-4o")
     parser = JsonOutputParser(pydantic_object=Tags)
 
@@ -77,3 +78,22 @@ def get_tags_from_gpt(course_name, level, doc_content):
     answer = chain.invoke({"course_name": course_name, "level": level, "content": doc_content})
 
     return answer
+
+def build_tag_alias_map(tag_lists: list, title_list: list) -> defaultdict:
+    tag_map = defaultdict(lambda: {
+        "tag": None,
+        "aliases": set()
+    })
+
+    for tags, titles in zip(tag_lists, title_list):
+        title_context = " / ".join(titles)
+
+        for tag in tags:
+            entry = tag_map[tag]
+            entry["tag"] = tag
+            entry["aliases"].add(title_context)
+
+    return tag_map
+
+def tag_to_embedding_text(tag: str, aliases: set) -> str:
+    return f"{tag}. Contexts: " + "; ".join(sorted(aliases))

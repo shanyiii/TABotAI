@@ -1,4 +1,5 @@
 import discord
+from qdrant import response_from_ai
 from qdrant_langchain import qdrant_retrieval
 from config import DISCORD_TOKEN
 
@@ -21,7 +22,7 @@ async def on_message(message):
         return
     
     print("Message received: ", message.content)
-    response_text = await qdrant_retrieval(message.content)
+    response_text = await response_from_ai(message.content)
     await message.channel.send(response_text)
 
 client.run(DISCORD_TOKEN)
