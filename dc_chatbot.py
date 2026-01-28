@@ -20,6 +20,7 @@ async def on_message(message):
     if message.author == client.user:
         return
     
+    print("Message received: ", message.content)
     response_text = await qdrant_retrieval(message.content)
     await message.channel.send(response_text)
 
