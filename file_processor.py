@@ -1,14 +1,18 @@
 from marker.converters.pdf import PdfConverter
 from marker.models import create_model_dict
 
-from common import FILEPATH
-
 from langchain_opentutorial import set_env
 from langchain_text_splitters import (
     MarkdownHeaderTextSplitter,
     RecursiveCharacterTextSplitter,
 )
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import JsonOutputParser
+from langchain_openai import ChatOpenAI
+from pydantic import BaseModel, Field
+
 from config import OPENAI_API_KEY, LANGCHAIN_API_KEY
+from common import FILEPATH
 
 set_env(
     {
@@ -29,10 +33,7 @@ def pdf2md():
     with open("marker_test_output.md", "w", encoding="utf-8") as f:
         f.write(markdown_output)
 
-def splitter():
-    with open("marker_test_output.md", 'r', encoding='utf-8') as input_file:
-        md_content = input_file.read()
-
+def md_splitter(md_content):
     headers_to_split_on = [  
         ("#", "Header 1"),  
         ("##", "Header 2"),  
@@ -54,3 +55,25 @@ def splitter():
     #     print("=" * 30)
     
     return final_chunks
+
+class Tags(BaseModel):
+    tags: list[str] = Field(description="與文本有關的標籤列表")
+
+def get_tags_from_gpt(course_name, level, doc_content):
+    model = ChatOpenAI(temperature=0, model_name="gpt-4o")
+    parser = JsonOutputParser(pydantic_object=Tags)
+
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", "你是一位專業的{course_name}課程助教，請為以下內容提取3個{level}中文關鍵字標籤，並將3個標籤轉為英文一起輸出，如果原本的標籤是英文，則不須翻譯。"),
+            ("user", "#Format: {format_instructions}\n\n#Content: {content}"),
+        ]
+    )
+
+    prompt = prompt.partial(format_instructions=parser.get_format_instructions())
+
+    chain = prompt | model | parser
+
+    answer = chain.invoke({"course_name": course_name, "level": level, "content": doc_content})
+
+    return answer
