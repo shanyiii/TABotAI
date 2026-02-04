@@ -1,5 +1,5 @@
 import discord
-from qdrant_langchain import qdrant_retrieval
+from neo4j_controller import neo4j_retriever
 from config import DISCORD_TOKEN
 
 # client 是跟 discord 連接，intents 是要求機器人的權限
@@ -21,7 +21,7 @@ async def on_message(message):
         return
     
     print("Message received: ", message.content)
-    response_text = await qdrant_retrieval(message.content)
+    response_text = await neo4j_retriever(message.content)
     await message.channel.send(response_text)
 
 client.run(DISCORD_TOKEN)
