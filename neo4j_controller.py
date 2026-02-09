@@ -10,14 +10,14 @@ from haystack.components.embedders import SentenceTransformersTextEmbedder, Sent
 from neo4j_haystack import Neo4jEmbeddingRetriever, Neo4jDocumentStore
 
 from file_processor import md_splitter
-from config import OPENAI_API_KEY
+from config import OPENAI_API_KEY, NEO4J_PASSWORD
 
 os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 
 document_store = Neo4jDocumentStore(
     url="neo4j://localhost:7687",
     username="neo4j",
-    password="tabotaidb",
+    password=NEO4J_PASSWORD,
     database="neo4j",
     embedding_dim=384,
     index="document-embeddings",
