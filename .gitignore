@@ -209,3 +209,4 @@ __marimo__/
 config.py
 
 qdrant_storage/
+neo4j_storage/
